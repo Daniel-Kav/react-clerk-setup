@@ -1,0 +1,381 @@
+enum doc_type_enum {
+  national_id_card
+  student_id_card
+  admission_letter
+}
+
+enum game_category_enum {
+  BATTLE_ROYALE
+  MULTIPLAYER
+  SPORTS_1V1
+  SPORTS_2V2
+  FIGHTING
+}
+
+enum gender_enum {
+  MALE
+  FEMALE
+  ANY
+}
+
+enum member_status_enum {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum preference_type {
+  EMAIL_ALERT
+  SMS_ALERT
+  PUSH_ALERT
+  COMPANY_NEWS
+  ACCOUNT_ACTIVITY
+  NEW_MESSAGES
+  RATING_REMINDERS
+  UPDATE_NOTIFICATIONS
+  COMMENT_NOTIFICATIONS
+  BUYER_REVIEWS
+  MARKETING
+}
+
+enum region_enum {
+  NAIROBI_NORTH
+  NAIROBI_SOUTH
+  CENTRAL
+  COAST
+  RIFT_VALLEY_NORTH
+  RIFT_VALLEY_SOUTH
+  WESTERN
+  NYANZA
+}
+
+enum registration_status_enum {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum registration_type_enum {
+  CAPTAIN_ONLY
+  OPEN
+}
+
+enum role_enum {
+  admin
+  user
+  super_admin
+}
+
+enum tournament_results_enum {
+  WINNER
+  RUNNER_UP
+  SEMI_FINALIST
+  QUARTER_FINALIST
+  ELIMINATED
+}
+
+enum tournament_status_enum {
+  UPCOMING
+  REGISTRATION_OPEN
+  REGISTRATION_CLOSED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  ON_HOLD
+}
+
+table admins {
+  admin_id uuid [pk, not null, default: `gen_random_uuid()`]
+  full_name varchar [not null]
+  role role_enum [not null, default: 'admin']
+  bio text
+  contact_info varchar
+}
+
+table auth {
+  auth_id uuid [pk, not null, default: `gen_random_uuid()`]
+  user_id uuid [not null]
+  email_verified boolean [not null, default: false]
+  email_verification_token varchar
+  email_verification_expires timestamp
+  password varchar [not null]
+  reset_password_token varchar
+  reset_password_expires timestamp
+  role role_enum [not null, default: 'user']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+table donations {
+  donation_id uuid [pk, not null, default: `gen_random_uuid()`]
+  user_id uuid [not null]
+  amount numeric [not null]
+  donation_date timestamp [default: `now()`]
+}
+
+table events {
+  event_id uuid [pk, not null, default: `gen_random_uuid()`]
+  event_name varchar [not null]
+  description text
+  event_date date [not null]
+  location varchar
+  created_at timestamp [default: `now()`]
+}
+
+table games {
+  game_id uuid [pk, not null, default: `gen_random_uuid()`]
+  game_name varchar [not null]
+  game_logo varchar
+  description text
+  category game_category_enum [not null]
+  registration_type registration_type_enum [not null]
+  max_team_size integer [not null]
+  min_team_size integer [not null]
+  allowed_regions region_enum[]
+  allowed_gender gender_enum [default: 'ANY']
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    game_name [name: 'game_name_idx']
+    category [name: 'game_category_idx']
+    allowed_regions [name: 'game_region_idx']
+  }
+}
+
+table news {
+  news_id uuid [pk, not null, default: `gen_random_uuid()`]
+  title varchar [not null]
+  content text [not null]
+  author_id uuid [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+table player_roles {
+  role_id uuid [pk, not null, default: `gen_random_uuid()`]
+  game_id uuid
+  role_name varchar [not null]
+  description text
+}
+
+table sponsors {
+  sponsor_id uuid [pk, not null, default: `gen_random_uuid()`]
+  sponsor_name varchar [not null]
+  sponsor_logo varchar
+  sponsor_url varchar
+}
+
+table student_verifications {
+  verification_id uuid [pk, not null, default: `gen_random_uuid()`]
+  user_id uuid [not null, unique]
+  school_id varchar
+  student_email varchar [not null, unique]
+  email_verified boolean [not null, default: false]
+  email_verification_token varchar
+  email_verification_expires timestamp
+  is_verified boolean [not null, default: false]
+  verification_date timestamp [default: `now()`]
+  documents_submitted boolean [not null, default: false]
+  documents_verified boolean [not null, default: false]
+  document_id uuid
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+table team_members {
+  member_id uuid [pk, not null, default: `gen_random_uuid()`]
+  team_id uuid [not null]
+  user_id uuid [not null]
+  role_id uuid
+  joined_at timestamp [default: `now()`]
+  status member_status_enum [default: 'ACTIVE']
+  is_captain boolean [default: false]
+  is_vice_captain boolean [default: false]
+  is_substitute boolean [default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (team_id, user_id) [name: 'team_user_idx', unique]
+    team_id [name: 'team_captain_idx', unique]
+    team_id [name: 'team_vice_captain_idx', unique]
+    role_id [name: 'member_role_idx']
+    status [name: 'member_status_idx']
+  }
+}
+
+table team_registration_status {
+  registration_id uuid [pk, not null, default: `gen_random_uuid()`]
+  team_id uuid
+  tournament_id uuid
+  status registration_status_enum [not null, default: 'PENDING']
+  registration_date timestamp [default: `now()`]
+  verification_date timestamp
+  verified_by uuid
+  rejection_reason text
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    team_id [name: 'team_idx']
+  }
+}
+
+table teams {
+  team_id uuid [pk, not null, default: `gen_random_uuid()`]
+  team_name varchar [not null]
+  university_id uuid [not null]
+  game_id uuid [not null]
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    team_name [name: 'team_name_idx']
+    game_id [name: 'team_game_idx']
+    university_id [name: 'team_uni_idx']
+  }
+}
+
+table tournament_results {
+  result_id uuid [pk, not null, default: `gen_random_uuid()`]
+  team_id uuid [not null]
+  tournament_id uuid [not null]
+  position tournament_results_enum [not null]
+  matches_played integer [default: 0]
+  matches_won integer [default: 0]
+  matches_lost integer [default: 0]
+  points_scored integer [default: 0]
+  prize_amount "numeric(10, 2)" [default: '0']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    team_id [name: 'result_team_idx']
+    tournament_id [name: 'result_tournament_idx']
+    position [name: 'result_position_idx']
+  }
+}
+
+table tournaments {
+  tournament_id uuid [pk, not null, default: `gen_random_uuid()`]
+  game_id uuid [not null]
+  tournament_name varchar [not null]
+  description text
+  registration_deadline date [not null]
+  status tournament_status_enum [not null, default: 'UPCOMING']
+  start_date timestamp [not null]
+  end_date timestamp [not null]
+  rules text
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    game_id [name: 'tournament_game_idx']
+    start_date [name: 'tournament_date_idx']
+    tournament_name [name: 'tournament_name_idx']
+  }
+}
+
+table universities {
+  university_id uuid [pk, not null, default: `gen_random_uuid()`]
+  university_name varchar(255) [not null]
+  university_logo_url varchar(255)
+  email_domain varchar(100)
+  has_whatsapp_group boolean [default: false]
+  whatsapp_group_link varchar(255)
+  whatsapp_no integer [default: 0]
+  has_leader boolean [default: false]
+  location varchar(255)
+  region varchar [not null]
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    university_name [name: 'uni_name_idx']
+    region [name: 'uni_region_idx']
+    email_domain [name: 'uni_email_domain_idx']
+  }
+}
+
+table user_preferences {
+  preference_id uuid [pk, not null, default: `gen_random_uuid()`]
+  user_id uuid [not null]
+  type preference_type [not null]
+  opted_in boolean [default: false]
+  is_student_seller_only boolean [default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (user_id, type) [name: 'user_type_idx']
+  }
+}
+
+table users {
+  user_id uuid [pk, not null, default: `gen_random_uuid()`]
+  full_name varchar(255) [not null]
+  email varchar(255) [not null, unique]
+  contact_phone varchar(20) [not null]
+  university_id uuid
+  discord_name varchar(100)
+  gender gender_enum
+  gamertag varchar(100)
+  verification_id uuid
+  is_profile_complete boolean [default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    email [name: 'email_idx']
+  }
+}
+
+table verification_documents {
+  document_id uuid [pk, not null, default: `gen_random_uuid()`]
+  verification_id uuid [not null]
+  document_type doc_type_enum [not null]
+  document_url varchar [not null]
+  uploaded_at timestamp [default: `now()`]
+}
+
+ref: users.user_id - auth.user_id
+
+ref: donations.user_id - users.user_id
+
+ref: news.author_id - users.user_id
+
+ref: player_roles.game_id > games.game_id
+
+ref: team_members.role_id - player_roles.role_id
+
+ref: user_preferences.user_id > users.user_id
+
+ref: users.verification_id - student_verifications.verification_id
+
+ref: team_members.user_id > users.user_id
+
+ref: team_members.team_id > teams.team_id
+
+ref: team_registration_status.team_id > teams.team_id
+
+ref: team_registration_status.tournament_id > tournaments.tournament_id
+
+ref: team_registration_status.verified_by - users.user_id
+
+ref: teams.university_id > universities.university_id
+
+ref: teams.game_id > games.game_id
+
+ref: tournaments.game_id > games.game_id
+
+ref: tournament_results.team_id > teams.team_id
+
+ref: tournament_results.tournament_id > tournaments.tournament_id
+
+ref: users.university_id > universities.university_id
+
+ref: verification_documents.verification_id > student_verifications.verification_id

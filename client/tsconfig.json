@@ -1,23 +1,37 @@
+// {
+//   "compilerOptions": {
+//     "target": "ESNext",
+//     "module": "NodeNext",
+//     "strict": true,
+//     "verbatimModuleSyntax": true,
+//     "skipLibCheck": true,
+//     "types": [
+//       "node"
+//     ],
+//     "jsx": "react-jsx",
+//     "jsxImportSource": "hono/jsx",
+//   }
+// }
 {
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
-    "moduleResolution": "Node",
     "outDir": "./dist",
     "rootDir": "./src",
+    "moduleResolution": "Node",
     "strict": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "types": [
       "node"
     ],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+ 
   },
   "include": [
-    "src/**/*"
-  ],
+    "src/**/*.ts"
+, "src/validator.ts"  ],
   "exclude": [
-    "node_modules",
-    "dist"
+    "node_modules"
   ]
 }
