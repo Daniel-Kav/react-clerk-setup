@@ -10,6 +10,9 @@ import { prometheus } from '@hono/prometheus'
 
 import { userRouter } from './users/user.router'
 import { bookRouter } from './books/books.router'
+import { users } from './drizzle/schema' // Add this line to import the users model
+import db from './drizzle/db'
+
 
 
 const app = new Hono().basePath('/api')
@@ -28,6 +31,31 @@ app.use(trimTrailingSlash()) //removes trailing slashes from the request URL
 app.use('/', timeout(10000, customTimeoutException))
 //3rd party middlewares
 app.use('*', registerMetrics)
+
+
+//webhook endpoint
+// Webhook endpoint
+app.post('/webhook', async (c) => {
+  const event = await c.req.json();
+
+  if (event.type === 'user.created') {
+    const userData = event.data;
+
+    // Insert user into database
+    await db.insert(users).values({
+      id: userData.id,
+      clerkId: userData.id,
+      firstName: userData.first_name,
+      lastName: userData.last_name,
+      email: userData.email_addresses[0].email_address,
+      createdAt: new Date(userData.created_at * 1000),
+    });
+
+    console.log('User created and saved to database:', userData);
+  }
+
+  return c.text('Webhook received', 200);
+});
 
 
 // default route
