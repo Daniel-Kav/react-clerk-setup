@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/clerk-react';
+import { UserButton, useUser } from '@clerk/clerk-react';
 
 export default function Protected() {
   const { user } = useUser();
@@ -8,6 +8,7 @@ export default function Protected() {
       <h1>Protected Page</h1>
       <p>Welcome, {user?.firstName}!</p>
       <p>This page is only accessible to authenticated users.</p>
+      <UserButton />
     </div>
   );
 }
