@@ -9,13 +9,12 @@ import { HTTPException } from 'hono/http-exception'
 import { prometheus } from '@hono/prometheus'
 
 import { userRouter } from './users/user.router'
-import { bookRouter } from './books/books.router'
 import { users } from './drizzle/schema' // Add this line to import the users model
 import db from './drizzle/db'
 
 
 
-const app = new Hono().basePath('/api')
+const app = new Hono()
 
 const customTimeoutException = () =>
   new HTTPException(408, {
@@ -69,7 +68,7 @@ app.get('/timeout', async (c) => {
 app.get('/metrics', printMetrics)
 
 
-app.route("/", bookRouter)   // /users/ /profile
+// app.route("/", bookRouter)   // /users/ /profile
 
 
 

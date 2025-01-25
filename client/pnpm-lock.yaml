@@ -40,7 +40,7 @@ importers:
         version: 3.23.8
     devDependencies:
       '@types/node':
-        specifier: ^20.11.17
+        specifier: ^20.14.1
         version: 20.14.1
       '@types/pg':
         specifier: ^8.11.6
@@ -51,6 +51,9 @@ importers:
       tsx:
         specifier: ^4.7.1
         version: 4.11.2
+      typescript:
+        specifier: ^5.7.3
+        version: 5.7.3
 
 packages:
 
@@ -820,6 +823,11 @@ packages:
     resolution: {integrity: sha512-s6zVrxuyKbbAsSAD5ZPTB77q4YIdRctkTbJ2/Dqlinwz+8ooH2gd+YA7VA6Pa93KML9GockVvoxjZ2vHP+mu8g==}
     engines: {node: '>=16'}
 
+  typescript@5.7.3:
+    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
@@ -1379,6 +1387,8 @@ snapshots:
       fsevents: 2.3.3
 
   type-fest@4.33.0: {}
+
+  typescript@5.7.3: {}
 
   undici-types@5.26.5: {}
 

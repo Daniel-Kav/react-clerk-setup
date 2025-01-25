@@ -1,10 +1,9 @@
-// bookSchema.ts
-import { z } from "zod";
+import { z } from 'zod';
 
-// Define Zod validator schema for Book
-export const bookSchema = z.object({
-  id: z.number(),     // Assuming 'id' is a number
-  title: z.string().max(255),  // Max length of 255 characters for title
-  author: z.string().max(100), // Max length of 100 characters for author
-  year: z.number().nullable(), // Nullable number for year
+export const userSchema = z.object({
+  username: z.string().min(3, 'Username must be at least 3 characters long').nonempty('Username is required'),
+  email: z.string().email('Invalid email format').nonempty('Email is required'),
+  password: z.string().min(8, 'Password must be at least 8 characters long').nonempty('Password is required'),
+  confirmPassword: z.string()
+    .nonempty('Confirm Password is required')
 });
